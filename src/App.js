@@ -46,10 +46,10 @@ function App() {
     <>
       <TableContextProvider>
         <TableContainer />
+        {/* <TableContainer />
         <TableContainer />
         <TableContainer />
-        <TableContainer />
-        <TableContainer />
+        <TableContainer /> */}
       </TableContextProvider>
     </>
   )
@@ -58,17 +58,18 @@ function App() {
 // TableContainer is needed for the sole purpose of providing individual instance of data from context to table
 function TableContainer() {
   const tableData = useContext(TableContext);
+  //! the commented out code below was needed when 'tableData' was appended to every object(row)
   // We want to set context to state (and create a copy of an object in useEffect hook) to apply different filters when tables are rendered on the screen
-  const [data, setData] = useState([]);
+  // const [data, setData] = useState([]);
 
-  useEffect(() => {
-    if (tableData) {
-      let newData = tableData.map(rowData => Object.assign({}, rowData))
-      setData(newData);
-    }
-  }, [tableData])
+  // useEffect(() => {
+  //   if (tableData) {
+  //     let newData = tableData.map(rowData => Object.assign({}, rowData))
+  //     setData(newData);
+  //   }
+  // }, [tableData])
 
-  return <Table data={data} />
+  return <Table data={tableData} />
 }
 
 function Table({ data }) {
@@ -77,7 +78,7 @@ function Table({ data }) {
     { title: "Name", field: "name" },
     { title: "Surname", field: "surname" },
     { title: "Birth Year", field: "birthYear" },
-  ]))
+  ]), [])
 
   return useMemo(() => {
     return (
