@@ -10,6 +10,7 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "axios": "^0.21.1",
+    "express": "^4.17.1",
     "faker": "^5.5.3",
     "material-table": "^1.69.3",
     "react": "^17.0.2",
@@ -19,6 +20,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:custom": "yarn build && node src/server.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
