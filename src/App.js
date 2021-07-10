@@ -1,8 +1,6 @@
 import MaterialTable from '@material-table/core';
-import React, { useContext, useMemo, forwardRef, useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-
-import TableContextProvider, { TableContext } from './TableContext';
+import React, { useMemo, forwardRef, useState, useEffect, useRef } from 'react';
+import Faker from 'faker';
 
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -40,59 +38,83 @@ const tableIcons = {
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 };
 
+// copy-pasted from Dan Abramov's post: https://overreacted.io/making-setinterval-declarative-with-react-hooks/
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
+  
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+  
+  // Set up the interval.
+  // eslint-disable-next-line consistent-return
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      const id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
+
+const generateUsers = () => {
+  const randomNumberOfUsers = 5 + Math.floor(Math.random() * 10);
+  const newUsers = [];
+  for (let i = 0; i < randomNumberOfUsers; i++) {
+    const user = {
+      title: Faker.name.title(),
+      name: Faker.name.firstName(),
+      surname: Faker.name.lastName(),
+      birthYear: Faker.date.between(1950, 2000).getFullYear(),
+    };
+    
+    newUsers.push(user)
+  }
+  
+  return newUsers;
+}
+
 
 function App() {
   return (
     <>
-      <TableContextProvider>
-        <TableContainer />
-        <TableContainer />
-        <TableContainer />
-        <TableContainer />
-        <TableContainer />
-      </TableContextProvider>
+      <Table />
+      <Table />
+      <Table />
+      <Table />
+      <Table />
     </>
   )
 }
 
-// TableContainer is needed for the sole purpose of providing individual instance of data from context to table
-function TableContainer() {
-  const tableData = useContext(TableContext);
-  //! the commented out code below was needed when 'tableData' was appended to every object(row)
-  // We want to set context to state (and create a copy of an object in useEffect hook) to apply different filters when tables are rendered on the screen
-  // const [data, setData] = useState([]);
-
-  // useEffect(() => {
-  //   if (tableData) {
-  //     let newData = tableData.map(rowData => Object.assign({}, rowData))
-  //     setData(newData);
-  //   }
-  // }, [tableData])
-
-  return <Table data={tableData} />
-}
-
-function Table({ data }) {
+function Table() {
   const columnsUsers = useMemo(() => ([
     { title: "Title", field: "title" },
     { title: "Name", field: "name" },
     { title: "Surname", field: "surname" },
     { title: "Birth Year", field: "birthYear" },
   ]), [])
+  
+  const [data, setData] = useState(generateUsers());
 
-  return useMemo(() => {
-    return (
-      <>
-        <MaterialTable
-          data={data}
-          icons={tableIcons}
-          columns={columnsUsers}
-          options={{ maxBodyHeight: '150px' }}
-        />
-      </>
-    )
+  useInterval(() => {
+    const newUsers = generateUsers();
+    setData(newUsers)
+  }, 300)
 
-  }, [data, columnsUsers])
+  return (
+    <>
+      <MaterialTable
+        data={data}
+        icons={tableIcons}
+        columns={columnsUsers}
+        options={{ maxBodyHeight: '150px' }}
+      />
+    </>
+  )
 }
 
 export default App;
